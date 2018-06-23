@@ -1,0 +1,92 @@
+apply plugin: 'java-library'
+apply plugin: 'kotlin'
+apply from: '../ktlintConfig.gradle'
+apply plugin: 'org.junit.platform.gradle.plugin'
+apply plugin: 'com.jfrog.bintray'
+
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath ("org.junit.platform:junit-platform-gradle-plugin:1.0.0-M4")
+    }
+}
+
+junitPlatform {
+    filters {
+        engines {
+            include 'spek'
+        }
+    }
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    publications = ['MyPublication']
+    pkg {
+        repo = 'Directions-Android-SDK'
+        name = 'core'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://gitlab.com/jaroslaw.michalik.rozkmin/directions-sdk'
+        version {
+            name = '1.0'
+            desc = 'Directions Android SDK'
+            released  = new Date()
+        }
+    }
+}
+
+def pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            id "rozkminiacz"
+            name "Jarosław Michalik"
+            email "michalik@protonmail.ch"
+        }
+    }
+}
+
+// Create the publication with the pom configuration:
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            from components.java
+            groupId 'me.rozkmin.directions'
+            artifactId 'core'
+            version '1.0'
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'Directions SDK for Android')
+                root.appendNode('name', 'Directions Android SDK')
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
+
+dependencies {
+
+    implementation rxJavaDependencies.rxJava
+    implementation retrofitDependencies.values()
+    implementation kotlinDependencies.values()
+
+    testImplementation kotlinTestDependencies.values()
+    testImplementation spekDependencies.values()
+    testImplementation unitTestDependencies.values()
+
+    ktlint ktlintDependency
+
+}
+

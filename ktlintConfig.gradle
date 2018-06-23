@@ -1,0 +1,22 @@
+ext{
+    configurations {
+        ktlint
+    }
+
+    task ktlint(type: JavaExec) {
+        main = "com.github.shyiko.ktlint.Main"
+        classpath = configurations.ktlint
+        args "src/**/*.kt"
+    }
+
+    check.dependsOn ktlint
+
+    task ktlintFormat(type: JavaExec) {
+        main = "com.github.shyiko.ktlint.Main"
+        classpath = configurations.ktlint
+        args "-F", "src/**/*.kt"
+    }
+
+    def KtlintVersion = "0.14.0"
+    ext.ktlintDependency = "com.github.shyiko:ktlint:${KtlintVersion}"
+}

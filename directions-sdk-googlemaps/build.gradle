@@ -1,0 +1,49 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: "de.mannodermaus.android-junit5"
+apply from: '../ktlintConfig.gradle'
+
+android {
+    compileSdkVersion 27
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+junitPlatform {
+    platformVersion '1.0.2'
+    filters {
+        engines {
+            include 'spek'
+        }
+    }
+}
+
+dependencies {
+    compileOnly project(":directions-sdk")
+    testImplementation project(":directions-sdk")
+    api mapsDependencies.googleMapsCore
+    api rxJavaDependencies.rxJava
+    implementation kotlinDependencies.values()
+
+    testImplementation kotlinTestDependencies.values()
+    testImplementation spekDependencies.values()
+    testImplementation unitTestDependencies.values()
+
+    ktlint ktlintDependency
+}
